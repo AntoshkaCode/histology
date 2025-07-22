@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{_layout}">
+<head>
+    <title layout:title-pattern="$CONTENT_TITLE - $LAYOUT_TITLE">Histology Portal</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .wrapper {
+            display: flex;
+            width: 100%;
+            align-items: stretch;
+            min-height: 100vh;
+        }
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            background: #343a40;
+            color: #fff;
+            transition: all 0.3s;
+            min-height: 100vh;
+        }
+        #sidebar.active {
+            margin-left: -250px;
+        }
+        #sidebar .sidebar-header {
+            padding: 20px;
+            background: #343a40;
+        }
+        #sidebar ul.components {
+            padding: 20px 0;
+        }
+        #sidebar ul li a {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            display: block;
+            color: #fff;
+            text-decoration: none;
+        }
+        #sidebar ul li a:hover {
+            color: #343a40;
+            background: #fff;
+        }
+        #sidebar ul li.active > a, a[aria-expanded="true"] {
+            color: #fff;
+            background: #6d7fcc;
+        }
+        #content {
+            width: 100%;
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+        @media (max-width: 768px) {
+            #sidebar {
+                margin-left: -250px;
+            }
+            #sidebar.active {
+                margin-left: 0;
+            }
+            #sidebarCollapse span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li th:classappend="${#httpServletRequest.requestURI == '/' ? 'active' : ''}">
+                    <a th:href="@{/}">User Sign Up</a>
+                </li>
+                <li th:classappend="${#httpServletRequest.requestURI.startsWith('/jobs') ? 'active' : ''}">
+                    <a th:href="@{/jobs/apply}">Job Form</a>
+                </li>
+                <li>
+                    <a href="#" class="disabled">Login (disabled)</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-info">
+                        <i class="fas fa-align-left"></i>
+                        <span>Toggle Sidebar</span>
+                    </button>
+                </div>
+            </nav>
+            
+            <!-- Page content will be inserted here -->
+            <div layout:fragment="content">
+                <!-- Content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Popper.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Font Awesome -->
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#sidebar').toggleClass('active');
+            });
+        });
+    </script>
+</body>
+</html>
