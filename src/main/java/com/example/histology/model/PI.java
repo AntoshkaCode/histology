@@ -1,7 +1,7 @@
 package com.example.histology.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
 
 @Entity
 @Table(name = "principal_investigators")
@@ -22,8 +22,7 @@ public class PI {
     @Column(nullable = false, unique = true)
     private String email;
     
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+
     
     // Default constructor
     public PI() {}
@@ -61,13 +60,7 @@ public class PI {
         this.department = department;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 
     public String getEmail() {
         return email;
@@ -77,8 +70,5 @@ public class PI {
         this.email = email;
     }
     
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+
 }

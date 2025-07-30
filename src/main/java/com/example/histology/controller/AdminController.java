@@ -198,7 +198,7 @@ public class AdminController {
     public String listPIs(Model model) {
         List<PI> pis = null;
         try {
-            pis = piRepository.findAllByOrderByCreatedAtDesc();
+            pis = piRepository.findAll();
         } catch (Exception e) {
             pis = java.util.Collections.emptyList();
             model.addAttribute("errorMessage", "Could not load PIs.");

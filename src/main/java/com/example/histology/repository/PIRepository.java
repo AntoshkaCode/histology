@@ -9,5 +9,5 @@ import java.util.Optional;
 public interface PIRepository extends JpaRepository<PI, Long> {
     boolean existsByEmail(String email);
     Optional<PI> findByEmail(String email);
-    List<PI> findAllByOrderByCreatedAtDesc();
+
 }

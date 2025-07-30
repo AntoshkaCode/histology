@@ -67,7 +67,6 @@ public class PIController {
             pi.setLastName(piApplication.getLastName());
             pi.setDepartment(piApplication.getDepartment());
             pi.setEmail(piApplication.getEmail());
-            pi.setCreatedAt(java.time.LocalDateTime.now());
             piRepository.save(pi);
             redirectAttributes.addFlashAttribute("successMessage", "PI has been created successfully!");
             return "redirect:/admin/pis";
