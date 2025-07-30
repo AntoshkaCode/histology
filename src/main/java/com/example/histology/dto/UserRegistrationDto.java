@@ -14,6 +14,9 @@ public class UserRegistrationDto {
     @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
     
+    @NotEmpty(message = "Email is required")
+    private String email;
+
     @NotEmpty(message = "First name is required")
     private String firstName;
     
@@ -39,6 +42,13 @@ public class UserRegistrationDto {
         return password;
     }
     
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getFirstName() {
         return firstName;
     }

@@ -55,6 +55,29 @@ public class AdminController {
         return "admin/users";
     }
 
+    @GetMapping("/users/add")
+    public String showAddUserForm(Model model) {
+        model.addAttribute("user", new UserRegistrationDto());
+        return "admin/user-add";
+    }
+
+    @PostMapping("/users/add")
+    public String addUser(@ModelAttribute("user") @Valid UserRegistrationDto registrationDto,
+                         BindingResult result,
+                         RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            return "admin/user-add";
+        }
+        try {
+            userService.registerNewUser(registrationDto);
+            redirectAttributes.addFlashAttribute("successMessage", "User added successfully!");
+            return "redirect:/admin/users";
+        } catch (Exception e) {
+            result.rejectValue("username", "user.exists", "An account already exists with this username.");
+            return "admin/user-add";
+        }
+    }
+
     @PostMapping("/users")
     public String createUser(@Valid @ModelAttribute("user") User user, 
                            BindingResult result, 
