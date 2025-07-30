@@ -48,6 +48,18 @@ public class User {
     @Column(name = "user_type", nullable = false)
     private UserType userType = UserType.USER;
 
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
+    private boolean enabled = true;
+    
+    @Email(message = "Email should be valid")
+    @Size(max = 100, message = "Email must be less than 100 characters")
+    @Column(length = 100)
+    private String email;
+    
+    @Size(max = 20, message = "Phone number must be less than 20 characters")
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
+
     public User(String username, String firstName, String lastName) {
         this.username = username;
         this.firstName = firstName;
@@ -142,5 +154,29 @@ public class User {
         if (userType != null) {
             this.userType = userType;
         }
+    }
+    
+    public boolean isEnabled() {
+        return enabled;
+    }
+    
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

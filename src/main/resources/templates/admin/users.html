@@ -32,58 +32,137 @@
     </nav>
 
     <div class="container mt-4">
+        <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Manage Users</h1>
-            <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                Add New User
-            </a>
+            <div>
+                <h1>Manage Users</h1>
+                <p class="text-muted mb-0">Manage user accounts and permissions</p>
+            </div>
+            <div>
+                <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="bi bi-plus-lg me-1"></i> Add User
+                </a>
+            </div>
+        </div>
+        
+        <!-- Search Bar -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form th:action="@{/admin/users}" method="get" class="row g-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" name="search" 
+                                   th:value="${searchTerm}" placeholder="Search users...">
+                            <button class="btn btn-outline-secondary" type="submit">Search</button>
+                            <a th:if="${searchTerm != null}" href="/admin/users" 
+                               class="btn btn-outline-danger">
+                                <i class="bi bi-x-lg"></i> Clear
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                        <span class="text-muted" th:if="${users != null}">
+                            <span th:text="${users.size()}">0</span> users found
+                        </span>
+                    </div>
+                </form>
+            </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>User Type</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="user : ${users}">
-                        <td th:text="${user.id}"></td>
-                        <td th:text="${user.username}"></td>
-                        <td th:text="${user.firstName}"></td>
-                        <td th:text="${user.lastName}"></td>
-                        <td>
-                            <span class="badge" 
-                                  th:class="${'bg-primary' + (user.userType.name() == 'ADMIN' ? ' bg-primary' : '') + 
-                                          (user.userType.name() == 'USER' ? ' bg-success' : '') + 
-                                          (user.userType.name() == 'VIEWER' ? ' bg-secondary' : '')}"
-                                  th:text="${user.userType.name()}">
-                            </span>
-                        </td>
-                        <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
-                        <td>
-                            <button class="btn btn-sm btn-warning me-2">Edit</button>
-                            <button class="btn btn-sm btn-danger">Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Contact</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user : ${users}">
+                                <td class="align-middle" th:text="${user.id}"></td>
+                                <td class="align-middle">
+                                    <div class="d-flex align-items-center">
+                                        <div class="user-avatar" th:text="${user.firstName?.substring(0, 1) ?: ''} + ${user.lastName?.substring(0, 1) ?: ''}"></div>
+                                        <div>
+                                            <div class="fw-semibold" th:text="${user.firstName} + ' ' + ${user.lastName}"></div>
+                                            <small class="text-muted" th:text="'@' + ${user.username}"></small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    <div th:if="${user.email}" class="d-flex align-items-center">
+                                        <i class="bi bi-envelope me-2 text-muted"></i>
+                                        <span th:text="${user.email}"></span>
+                                    </div>
+                                </td>
+                                <td class="align-middle">
+                                    <span class="badge" 
+                                          th:class="'bg-' + ${user.userType == 'ADMIN' ? 'primary' : (user.userType == 'USER' ? 'success' : 'secondary')}"
+                                          th:text="${user.userType}">
+                                    </span>
+                                </td>
+                                <td class="align-middle">
+                                    <span class="badge" 
+                                          th:class="user.enabled ? 'bg-success' : 'bg-secondary'"
+                                          th:text="${user.enabled ? 'Active' : 'Inactive'}">
+                                    </span>
+                                </td>
+                                <td class="text-end align-middle">
+                                    <div class="btn-group" role="group">
+                                        <a th:href="@{/admin/users/edit/} + ${user.id}" 
+                                           class="btn btn-sm btn-outline-primary"
+                                           data-bs-toggle="tooltip" 
+                                           title="Edit user">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-outline-danger"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteUserModal"
+                                                th:attr="data-user-id=${user.id}, data-user-name=${user.firstName} + ' ' + ${user.lastName}"
+                                                title="Delete user">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <button th:if="!user.enabled" 
+                                                type="button"
+                                                class="btn btn-sm btn-outline-success"
+                                                title="Activate user">
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:if="${users != null && users.isEmpty()}">
+                                <td colspan="6" class="text-center py-4">
+                                    <div class="text-muted">No users found</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Add User Modal -->
+    <!-- Add/Edit User Modal -->
     <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addUserModalLabel">
+                        <i class="bi bi-person-plus me-2"></i>Add New User
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form th:action="@{/admin/users}" method="post">
                     <div class="modal-body">
@@ -121,6 +200,127 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete user <strong id="deleteUserName"></strong>?</p>
+                    <p class="text-danger">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form id="deleteUserForm" method="post" style="display: inline;">
+                        <input type="hidden" name="_method" value="delete" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-1"></i> Delete User
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Message Toast -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span id="successMessage">Operation completed successfully</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <script>
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Handle delete modal
+            var deleteModal = document.getElementById('deleteUserModal');
+            if (deleteModal) {
+                deleteModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    var userId = button.getAttribute('data-user-id');
+                    var userName = button.getAttribute('data-user-name');
+                    
+                    document.getElementById('deleteUserName').textContent = userName;
+                    document.getElementById('deleteUserForm').action = '/admin/users/' + userId;
+                });
+            }
+
+            // Show success message if present in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const successMessage = urlParams.get('success');
+            const errorMessage = urlParams.get('error');
+            
+            if (successMessage) {
+                showToast(decodeURIComponent(successMessage), 'success');
+            }
+            if (errorMessage) {
+                showToast(decodeURIComponent(errorMessage), 'danger');
+            }
+        });
+
+        // Function to show toast message
+        function showToast(message, type = 'success') {
+            const toastEl = document.getElementById('successToast');
+            const toastMessage = document.getElementById('successMessage');
+            
+            // Update toast content and style
+            toastMessage.textContent = message;
+            toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
+            
+            // Show the toast
+            const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
+            toast.show();
+        }
+    </script>
+    <style>
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: 600;
+            color: #6c757d;
+        }
+        .status-badge {
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            border-radius: 50rem;
+        }
+        .status-active {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+        .action-btns .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+    </style>
 </body>
 </html>

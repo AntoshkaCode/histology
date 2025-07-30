@@ -29,6 +29,11 @@ public class UserService {
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
+    
+    public List<User> searchUsers(String searchTerm) {
+        String searchTermLike = "%" + searchTerm.toLowerCase() + "%";
+        return userRepository.searchUsers(searchTermLike);
+    }
 
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
@@ -40,6 +45,10 @@ public class UserService {
 
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+    
+    public boolean existsByUsernameAndIdNot(String username, Long id) {
+        return userRepository.existsByUsernameAndIdNot(username, id);
     }
 
     public User saveUser(User user) {

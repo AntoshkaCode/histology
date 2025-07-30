@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${piApplication.id} ? 'Edit PI - ' + ${piApplication.firstName} + ' ' + ${piApplication.lastName} : 'New Principal Investigator'">PI Application - Histology App</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div th:replace="fragments/navbar :: navbar"></div>
+    
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header text-white" th:classappend="${piApplication.id} ? 'bg-success' : 'bg-primary'">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0" th:text="${piApplication.id} ? 'Edit Principal Investigator' : 'New Principal Investigator'"></h3>
+                            <a th:if="${piApplication.id}" href="/admin/pis" class="btn btn-outline-light btn-sm">
+                                <i class="bi bi-arrow-left"></i> Back to List
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                            <span th:text="${successMessage}"></span>
+                        </div>
+                        
+                        <form th:action="${piApplication.id} ? @{/pi/apply/{id}(id=${piApplication.id})} : @{/pi/apply}" 
+                              th:object="${piApplication}" method="post" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">
+                                    First name is required
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">
+                                    Last name is required
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                                    Please provide a valid email address
+                                </div>
+                                <div th:if="${#fields.hasErrors('global')}" class="alert alert-danger mt-2" role="alert">
+                                    <span th:each="err : ${#fields.errors('global')}" th:text="${err}"></span>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="department" class="form-label">Department</label>
+                                <input type="text" class="form-control" id="department" th:field="*{department}" required>
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('department')}" th:errors="*{department}">
+                                    Department is required
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 mt-4">
+                                <button type="submit" class="btn" th:classappend="${piApplication.id} ? 'btn-success' : 'btn-primary'">
+                                    <i class="bi" th:classappend="${piApplication.id} ? 'bi-check-lg' : 'bi-send'"></i>
+                                    <span th:text="${piApplication.id} ? 'Update PI' : 'Submit Application'"></span>
+                                </button>
+                                <a th:if="${piApplication.id}" href="/admin/pis" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg"></i> Cancel
+                                </a>
+                                <a th:unless="${piApplication.id}" href="/" class="btn btn-outline-secondary">
+                                    <i class="bi bi-house"></i> Back to Home
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Client-side form validation
+        (function () {
+            'use strict'
+            
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+            
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+</body>
+</html>
