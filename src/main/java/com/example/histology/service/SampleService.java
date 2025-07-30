@@ -17,4 +17,15 @@ public class SampleService {
     public List<Sample> findAllSamples() {
         return sampleRepository.findAll();
     }
+
+    public org.springframework.data.domain.Page<Sample> findAllSamples(org.springframework.data.domain.Pageable pageable) {
+        return sampleRepository.findAll(pageable);
+    }
+
+    public Sample saveSample(Sample sample) {
+        if (sample.getCreatedAt() == null) {
+            sample.setCreatedAt(java.time.LocalDateTime.now());
+        }
+        return sampleRepository.save(sample);
+    }
 }

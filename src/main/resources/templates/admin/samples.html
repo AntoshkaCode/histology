@@ -25,17 +25,23 @@
                                 <th>Name</th>
                                 <th>Description</th>
                                 <th>Created</th>
+<th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                         <tr th:each="sample : ${samples}">
-                            <td th:text="${sample.id}"></td>
-                            <td th:text="${sample.name}"></td>
-                            <td th:text="${sample.description}"></td>
-                            <td th:text="${sample.createdAt}"></td>
-                        </tr>
+    <td th:text="${sample.id}"></td>
+    <td th:text="${sample.name}"></td>
+    <td th:text="${sample.description}"></td>
+    <td th:text="${sample.createdAt}"></td>
+    <td>
+        <a th:href="@{'/admin/samples/edit/' + ${sample.id}}" class="btn btn-sm btn-primary" title="Edit">
+            <i class="bi bi-pencil-square"></i>
+        </a>
+    </td>
+</tr>
                         <tr th:if="${samples != null && samples.isEmpty()}">
-                            <td colspan="4" class="text-center py-4">
+                            <td colspan="5" class="text-center py-4">
                                 <div class="text-muted">No samples found</div>
                             </td>
                         </tr>

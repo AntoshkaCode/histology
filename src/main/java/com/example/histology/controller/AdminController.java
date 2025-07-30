@@ -24,6 +24,10 @@ import java.util.List;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
+    @Autowired
+    private com.example.histology.service.SampleService sampleService;
+
+
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final PIRepository piRepository;
@@ -117,6 +121,13 @@ public class AdminController {
         }
     }
     
+    @PostMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        userService.deleteUser(id);
+        redirectAttributes.addFlashAttribute("successMessage", "User deleted successfully!");
+        return "redirect:/admin/users";
+    }
+
     @PostMapping("/users/update/{id}")
     public String updateUser(@PathVariable Long id,
                            @Valid @ModelAttribute("user") User user,
@@ -196,26 +207,7 @@ public class AdminController {
         return "admin/user-form";
     }
 
-    @PostMapping("/users/delete/{id}")
-    public String deleteUser(@PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
-        try {
-            // Prevent deleting the currently logged-in user
-            userService.findByUsername(principal.getName()).ifPresentOrElse(
-                currentUser -> {
-                    if (!currentUser.getId().equals(id)) {
-                        userService.deleteUser(id);
-                        redirectAttributes.addAttribute("success", "User deleted successfully");
-                    } else {
-                        redirectAttributes.addAttribute("error", "You cannot delete your own account");
-                    }
-                },
-                () -> redirectAttributes.addAttribute("error", "User not found")
-            );
-        } catch (Exception e) {
-            redirectAttributes.addAttribute("error", "Error deleting user: " + e.getMessage());
-        }
-        return "redirect:/admin/users";
-    }
+
     
     @GetMapping("/pis")
     public String listPIs(Model model) {
@@ -255,5 +247,33 @@ public class AdminController {
         return "admin/dashboard";
     }
 
+    // Show edit sample form
+    @GetMapping("/samples/edit/{id}")
+    public String showEditSampleForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        com.example.histology.model.Sample sample = sampleService.findAllSamples().stream()
+            .filter(s -> s.getId().equals(id)).findFirst().orElse(null);
+        if (sample == null) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Sample not found with ID: " + id);
+            return "redirect:/admin/samples";
+        }
+        model.addAttribute("sample", sample);
+        model.addAttribute("isEdit", true);
+        return "admin/sample-add";
+    }
+
+    // Handle edit sample submission
+    @PostMapping("/samples/edit/{id}")
+    public String updateSample(@PathVariable Long id,
+                               @ModelAttribute("sample") com.example.histology.model.Sample sample,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            sample.setId(id);
+            sampleService.saveSample(sample);
+            redirectAttributes.addFlashAttribute("successMessage", "Sample updated successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error updating sample: " + e.getMessage());
+        }
+        return "redirect:/admin/samples";
+    }
 
 }

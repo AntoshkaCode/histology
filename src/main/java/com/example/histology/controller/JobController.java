@@ -54,6 +54,42 @@ public class JobController {
         return "redirect:/jobs/admin/jobs";
     }
 
+    @PostMapping("/admin/jobs/delete/{id}")
+    public String deleteJob(@org.springframework.web.bind.annotation.PathVariable Long id,
+                            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        jobRepository.deleteById(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Job deleted successfully!");
+        return "redirect:/jobs/admin/jobs";
+    }
+
+    @GetMapping("/admin/jobs/edit/{id}")
+    public String showEditJobForm(@org.springframework.web.bind.annotation.PathVariable Long id, Model model, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        var jobOpt = jobRepository.findById(id);
+        if (jobOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Job not found with ID: " + id);
+            return "redirect:/jobs/admin/jobs";
+        }
+        model.addAttribute("job", jobOpt.get());
+        return "admin/job-edit";
+    }
+
+    @PostMapping("/admin/jobs/edit/{id}")
+    public String updateJob(@org.springframework.web.bind.annotation.PathVariable Long id,
+                            @org.springframework.web.bind.annotation.ModelAttribute("job") com.example.histology.model.Job job,
+                            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        var existingOpt = jobRepository.findById(id);
+        if (existingOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Job not found with ID: " + id);
+            return "redirect:/jobs/admin/jobs";
+        }
+        var existing = existingOpt.get();
+        existing.setJobName(job.getJobName());
+        existing.setSampleConditions(job.getSampleConditions());
+        existing.setPrincipalInvestigator(job.getPrincipalInvestigator());
+        jobRepository.save(existing);
+        redirectAttributes.addFlashAttribute("successMessage", "Job updated successfully!");
+        return "redirect:/jobs/admin/jobs";
+    }
 
     @GetMapping("/apply")
     public String showJobForm(Model model) {
