@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Job</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="fragments/navbar :: navbar"></div>
+<div class="container mt-5">
+    <h1>Add Job</h1>
+    <form th:action="@{/jobs/admin/jobs/add}" th:object="${job}" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="jobName" class="form-label">Job Name</label>
+            <input type="text" class="form-control" id="jobName" th:field="*{jobName}" required>
+            <div class="invalid-feedback">Please enter a job name.</div>
+        </div>
+        <div class="mb-3">
+            <label for="sampleConditions" class="form-label">Sample Conditions</label>
+            <input type="text" class="form-control" id="sampleConditions" th:field="*{sampleConditions}">
+        </div>
+        <div class="mb-3">
+            <label for="principalInvestigator" class="form-label">Principal Investigator</label>
+            <select class="form-select" id="principalInvestigator" th:field="*{principalInvestigator}" required>
+                <option th:each="piName : ${piNames}" th:value="${piName}" th:text="${piName}"></option>
+            </select>
+            <div class="invalid-feedback">Please select a PI.</div>
+        </div>
+        <button type="submit" class="btn btn-success">Add Job</button>
+        <a href="/jobs/admin/jobs" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Bootstrap validation
+    (() => {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+</body>
+</html>

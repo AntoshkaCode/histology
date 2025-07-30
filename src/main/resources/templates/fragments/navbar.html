@@ -20,9 +20,19 @@
                         <i class="bi bi-person-plus"></i> User Apply
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/jobs/admin/jobs/add}">
+                        <i class="bi bi-plus-circle"></i> Add Job
+                    </a>
+                </li>
                 <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
                     <a class="nav-link" th:href="@{/admin/samples/add}">
                         <i class="bi bi-plus-circle"></i> Add Sample
+                    </a>
+                </li>
+                <li class="nav-item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                    <a class="nav-link" th:href="@{/jobs/admin/jobs}">
+                        <i class="bi bi-briefcase"></i> Manage Jobs
                     </a>
                 </li>
                 <li class="nav-item dropdown">

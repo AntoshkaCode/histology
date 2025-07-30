@@ -12,6 +12,49 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/jobs")
 public class JobController {
 
+    private final com.example.histology.repository.JobRepository jobRepository;
+    private final com.example.histology.repository.PIRepository piRepository;
+
+    public JobController(com.example.histology.repository.JobRepository jobRepository, com.example.histology.repository.PIRepository piRepository) {
+        this.jobRepository = jobRepository;
+        this.piRepository = piRepository;
+    }
+
+    @GetMapping("/admin/jobs")
+    public String listJobs(Model model) {
+        model.addAttribute("jobs", jobRepository.findAll());
+        return "admin/jobs";
+    }
+
+    @GetMapping("/admin/jobs/add")
+    public String showAddJobForm(Model model) {
+        model.addAttribute("job", new com.example.histology.dto.JobDto());
+        // Fetch PI names for dropdown
+        java.util.List<String> piNames = new java.util.ArrayList<>();
+        for (var pi : piRepository.findAll()) {
+            piNames.add(pi.getFirstName() + " " + pi.getLastName());
+        }
+        model.addAttribute("piNames", piNames);
+        return "admin/job-add";
+    }
+
+    @PostMapping("/admin/jobs/add")
+    public String addJob(@org.springframework.web.bind.annotation.ModelAttribute("job") com.example.histology.dto.JobDto jobDto,
+                        org.springframework.validation.BindingResult result,
+                        org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            return "admin/job-add";
+        }
+        com.example.histology.model.Job job = new com.example.histology.model.Job();
+        job.setJobName(jobDto.getJobName());
+        job.setSampleConditions(jobDto.getSampleConditions());
+        job.setPrincipalInvestigator(jobDto.getPrincipalInvestigator());
+        jobRepository.save(job);
+        redirectAttributes.addFlashAttribute("successMessage", "Job added successfully!");
+        return "redirect:/jobs/admin/jobs";
+    }
+
+
     @GetMapping("/apply")
     public String showJobForm(Model model) {
         model.addAttribute("jobApplication", new JobApplication());
