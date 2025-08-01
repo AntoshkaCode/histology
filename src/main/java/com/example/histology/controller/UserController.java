@@ -24,6 +24,7 @@ public class UserController {
 
     @GetMapping
     public String showRegistrationForm(Model model) {
+        System.out.println("[DEBUG] UserController: showRegistrationForm() called");
         UserRegistrationDto registrationDto = new UserRegistrationDto();
         registrationDto.setUserType(UserType.USER); // Default to regular user
         model.addAttribute("user", registrationDto);

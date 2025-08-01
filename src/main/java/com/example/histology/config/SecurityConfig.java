@@ -18,9 +18,11 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        System.out.println("[DEBUG] SecurityConfig loaded: SecurityFilterChain bean initialized");
         http
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()  // Allow all requests without authentication
+                .requestMatchers("/register", "/register/**", "/login", "/login/**", "/css/**", "/js/**", "/webjars/**").permitAll()
+                .anyRequest().permitAll()
             )
             .formLogin(form -> form
                 .loginPage("/login")
