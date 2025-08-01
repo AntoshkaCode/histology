@@ -49,8 +49,9 @@
         <label for="userType" class="form-label">Position</label>
         <select class="form-select" id="userType" th:field="*{userType}" required>
             <option value="ADMIN">Admin</option>
+            <option value="PRINCIPAL_INVESTIGATOR">Principal Investigator</option>
+            <option value="TECHNICIAN">Technician</option>
             <option value="USER">User</option>
-            <option value="VIEWER">Viewer</option>
         </select>
         <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('userType')}" th:errors="*{userType}"></div>
     </div>
