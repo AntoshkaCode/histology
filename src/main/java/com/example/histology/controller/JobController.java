@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/jobs")
 public class JobController {
 
     private final com.example.histology.repository.JobRepository jobRepository;
@@ -21,10 +20,17 @@ public class JobController {
     }
 
     @GetMapping("/admin/jobs")
-    public String listJobs(Model model) {
-        model.addAttribute("jobs", jobRepository.findAll());
-        return "admin/jobs";
+public String listJobs(@org.springframework.web.bind.annotation.RequestParam(value = "search", required = false) String search, Model model) {
+    java.util.List<com.example.histology.model.Job> jobs;
+    if (search != null && !search.trim().isEmpty()) {
+        jobs = jobRepository.searchJobs(search.trim());
+    } else {
+        jobs = jobRepository.findAll();
     }
+    model.addAttribute("jobs", jobs);
+    model.addAttribute("search", search);
+    return "admin/jobs";
+}
 
     @GetMapping("/admin/jobs/add")
     public String showAddJobForm(Model model) {
@@ -51,7 +57,7 @@ public class JobController {
         job.setPrincipalInvestigator(jobDto.getPrincipalInvestigator());
         jobRepository.save(job);
         redirectAttributes.addFlashAttribute("successMessage", "Job added successfully!");
-        return "redirect:/jobs/admin/jobs";
+        return "redirect:/admin/jobs";
     }
 
     @PostMapping("/admin/jobs/delete/{id}")
@@ -59,7 +65,7 @@ public class JobController {
                             org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         jobRepository.deleteById(id);
         redirectAttributes.addFlashAttribute("successMessage", "Job deleted successfully!");
-        return "redirect:/jobs/admin/jobs";
+        return "redirect:/admin/jobs";
     }
 
     @GetMapping("/admin/jobs/edit/{id}")
@@ -67,7 +73,7 @@ public class JobController {
         var jobOpt = jobRepository.findById(id);
         if (jobOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Job not found with ID: " + id);
-            return "redirect:/jobs/admin/jobs";
+            return "redirect:/admin/jobs";
         }
         model.addAttribute("job", jobOpt.get());
         return "admin/job-edit";
@@ -80,7 +86,7 @@ public class JobController {
         var existingOpt = jobRepository.findById(id);
         if (existingOpt.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Job not found with ID: " + id);
-            return "redirect:/jobs/admin/jobs";
+            return "redirect:/admin/jobs";
         }
         var existing = existingOpt.get();
         existing.setJobName(job.getJobName());
@@ -88,7 +94,7 @@ public class JobController {
         existing.setPrincipalInvestigator(job.getPrincipalInvestigator());
         jobRepository.save(existing);
         redirectAttributes.addFlashAttribute("successMessage", "Job updated successfully!");
-        return "redirect:/jobs/admin/jobs";
+        return "redirect:/admin/jobs";
     }
 
     @GetMapping("/apply")
