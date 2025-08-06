@@ -11,6 +11,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class AppUser {
+    public String getFirstName() {
+        return this.firstName;
+    }
+
+    public UserType getUserType() {
+        return this.userType;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

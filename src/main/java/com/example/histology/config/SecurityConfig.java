@@ -6,6 +6,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import com.example.histology.service.AppUserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -17,17 +19,18 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AppUserDetailsService appUserDetailsService) throws Exception {
         System.out.println("[DEBUG] SecurityConfig loaded: SecurityFilterChain bean initialized");
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/register", "/register/**", "/login", "/login/**", "/css/**", "/js/**", "/webjars/**").permitAll()
                 .anyRequest().permitAll()
             )
+            .userDetailsService(appUserDetailsService)
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
-                .usernameParameter("username")
+                .usernameParameter("email")
                 .passwordParameter("password")
                 .defaultSuccessUrl("/")
                 .failureUrl("/login?error=true")

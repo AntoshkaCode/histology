@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findByEmail(String email);
     boolean existsByEmail(String email);
+    java.util.List<AppUser> findAllByUserType(com.example.histology.model.UserType userType);
 }

@@ -13,106 +13,179 @@
 <div class="container my-5">
     <h1 class="mb-4">Histology Data Overview</h1>
 
-        <!-- Jobs Table -->
-    <div class="mb-5">
+    <!-- Show a friendly message if no tables are visible -->
+    <div th:if="${not showJobs and not showSamples}" class="alert alert-info">
+        No data available for your role. Please contact an administrator if you believe this is an error.
+    </div>
+
+    <!-- Jobs Table -->
+    <div class="mb-5" th:if="${showJobs}">
         <h2>Jobs</h2>
+                <div th:if="${piEmailNotFound}" class="alert alert-warning mb-3">
+                    <strong>Note:</strong> No jobs can be shown because your email is not registered as a Principal Investigator. Please contact an administrator if this is incorrect.
+                </div>
+                <!-- Show filter dropdown for PI -->
+                <div th:if="${position == 'PRINCIPAL_INVESTIGATOR'}" class="mb-3">
+                    <form method="get" th:action="@{/}">
+                        <input type="hidden" name="jobPage" th:value="${jobsPage.number}" />
+                        <input type="hidden" name="samplePage" th:value="${samplesPage != null ? samplesPage.number : 0}" />
+                        <label for="jobFilter" class="form-label me-2">Show:</label>
+                        <select name="jobFilter" id="jobFilter" class="form-select d-inline w-auto me-2" onchange="this.form.submit()">
+                            <option value="all" th:selected="${jobFilter == null or jobFilter == 'all'}">All Jobs</option>
+                            <option value="mine" th:selected="${jobFilter == 'mine'}">My Jobs</option>
+                        </select>
+                    </form>
+                </div>
         <div class="table-responsive">
             <table class="table table-bordered table-hover align-middle">
                 <thead class="table-light">
                 <tr>
                     <th>ID</th>
-<th>Job Name</th>
-<th>Sample Conditions</th>
-<th>Principal Investigator</th>
+                    <th>Job Name</th>
+                    <th>Sample Conditions</th>
+                    <th>Principal Investigator</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="job : ${jobsPage.content}">
-    <td th:text="${job.id}"></td>
-    <td th:text="${job.jobName}"></td>
-    <td th:text="${job.sampleConditions}"></td>
-    <td th:text="${job.principalInvestigator}"></td>
-</tr>
+                    <td th:text="${job.id}"></td>
+                    <td th:text="${job.jobName}"></td>
+                    <td th:text="${job.sampleConditions}"></td>
+                    <td th:text="${job.principalInvestigator}"></td>
+                </tr>
                 </tbody>
             </table>
         </div>
         <!-- Jobs Pagination -->
-        <nav>
+        <nav th:if="${jobsPage != null}">
             <ul class="pagination justify-content-center">
                 <li class="page-item" th:classappend="${jobsPage.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{'/?jobPage=' + ${jobsPage.number - 1} + '&samplePage=' + ${samplesPage.number}}">Previous</a>
+                    <a class="page-link" th:if="${position == 'PRINCIPAL_INVESTIGATOR'}"
+   th:href="@{'/?jobPage=' + ${jobsPage.number - 1} + '&samplePage=' + (${samplesPage != null ? samplesPage.number : 0}) + '&jobFilter=' + ${jobFilter}}">Previous</a>
+<a class="page-link" th:unless="${position == 'PRINCIPAL_INVESTIGATOR'}"
+   th:href="@{'/?jobPage=' + ${jobsPage.number - 1} + '&samplePage=' + (${samplesPage != null ? samplesPage.number : 0})}">Previous</a>
                 </li>
                 <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, jobsPage.totalPages - 1)}" th:classappend="${pageNum == jobsPage.number} ? 'active'">
-                    <a class="page-link" th:href="@{'/?jobPage=' + ${pageNum} + '&samplePage=' + ${samplesPage.number}}" th:text="${pageNum + 1}"></a>
+                    <a class="page-link" th:if="${position == 'PRINCIPAL_INVESTIGATOR'}"
+   th:href="@{'/?jobPage=' + ${pageNum} + '&samplePage=' + (${samplesPage != null ? samplesPage.number : 0}) + '&jobFilter=' + ${jobFilter}}" th:text="${pageNum + 1}"></a>
+<a class="page-link" th:unless="${position == 'PRINCIPAL_INVESTIGATOR'}"
+   th:href="@{'/?jobPage=' + ${pageNum} + '&samplePage=' + (${samplesPage != null ? samplesPage.number : 0})}" th:text="${pageNum + 1}"></a>
                 </li>
                 <li class="page-item" th:classappend="${jobsPage.last} ? 'disabled'">
-                    <a class="page-link" th:href="@{'/?jobPage=' + ${jobsPage.number + 1} + '&samplePage=' + ${samplesPage.number}}">Next</a>
+                    <a class="page-link" th:if="${position == 'PRINCIPAL_INVESTIGATOR'}"
+   th:href="@{'/?jobPage=' + ${jobsPage.number + 1} + '&samplePage=' + (${samplesPage != null ? samplesPage.number : 0}) + '&jobFilter=' + ${jobFilter}}">Next</a>
+<a class="page-link" th:unless="${position == 'PRINCIPAL_INVESTIGATOR'}"
+   th:href="@{'/?jobPage=' + ${jobsPage.number + 1} + '&samplePage=' + (${samplesPage != null ? samplesPage.number : 0})}">Next</a>
                 </li>
             </ul>
         </nav>
     </div>
 
-        <!-- Samples Table -->
-    <div class="mb-5">
-        <h2>Samples</h2>
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-light">
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Embedded</th>
-                    <th>Cut</th>
-                    <th>Stain</th>
-                    <th>Completed</th>
-                    <th>Notes</th>
-                    <th>Created At</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="sample : ${samplesPage.content}">
-                    <td th:text="${sample.id}"></td>
-                    <td th:text="${sample.name}"></td>
-                    <td th:text="${sample.description}"></td>
-                    <td>
-                        <span th:if="${sample.embedded}" class="badge bg-success">Yes</span>
-                        <span th:unless="${sample.embedded}" class="badge bg-danger">No</span>
-                    </td>
-                    <td>
-                        <span th:if="${sample.cut}" class="badge bg-success">Yes</span>
-                        <span th:unless="${sample.cut}" class="badge bg-danger">No</span>
-                    </td>
-                    <td>
-                        <span th:if="${sample.stain}" class="badge bg-success">Yes</span>
-                        <span th:unless="${sample.stain}" class="badge bg-danger">No</span>
-                    </td>
-                    <td>
-                        <span th:if="${sample.completed}" class="badge bg-success">Yes</span>
-                        <span th:unless="${sample.completed}" class="badge bg-danger">No</span>
-                    </td>
-                    <td th:text="${sample.notes}"></td>
-                    <td th:text="${sample.createdAt != null ? #temporals.format(sample.createdAt, 'yyyy-MM-dd HH:mm') : ''}"></td>
-                </tr>
-                </tbody>
-            </table>
+    <!-- Samples Table -->
+    <div class="mb-5" th:if="${showSamples}">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">Samples</h2>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Embedded</th>
+                            <th>Cut</th>
+                            <th>Stain</th>
+                            <th>Completed</th>
+                            <th>Notes</th>
+                            <th>Created At</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:if="${samplesPage != null}">
+                            <tr th:each="sample : ${samplesPage.content}">
+                                <td th:text="${sample.id}"></td>
+                                <td th:text="${sample.name}"></td>
+                                <td th:text="${sample.description}"></td>
+                                <td th:text="${sample.embedded}"></td>
+                                <td th:text="${sample.cut}"></td>
+                                <td th:text="${sample.stain}"></td>
+                                <td th:text="${sample.completed}"></td>
+                                <td th:text="${sample.notes}"></td>
+                                <td th:text="${sample.createdAt}"></td>
+                            </tr>
+                        </th:block>
+                        <th:block th:if="${samplesPage == null}">
+                            <tr>
+                                <td colspan="9" class="text-center">No sample data available.</td>
+                            </tr>
+                        </th:block>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Samples Pagination -->
+                <nav th:if="${samplesPage != null}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${samplesPage.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{'/?jobPage=' + (${jobsPage != null ? jobsPage.number : 0}) + '&samplePage=' + ${samplesPage.number - 1}}">Previous</a>
+                        </li>
+                        <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, samplesPage.totalPages - 1)}" th:classappend="${pageNum == samplesPage.number} ? 'active'">
+                            <a class="page-link" th:href="@{'/?jobPage=' + (${jobsPage != null ? jobsPage.number : 0}) + '&samplePage=' + ${pageNum}}" th:text="${pageNum + 1}"></a>
+                        </li>
+                        <li class="page-item" th:classappend="${samplesPage.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{'/?jobPage=' + (${jobsPage != null ? jobsPage.number : 0}) + '&samplePage=' + ${samplesPage.number + 1}}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
-        <!-- Samples Pagination -->
-        <nav>
-            <ul class="pagination justify-content-center">
-                <li class="page-item" th:classappend="${samplesPage.first} ? 'disabled'">
-                    <a class="page-link" th:href="@{'/?jobPage=' + ${jobsPage.number} + '&samplePage=' + ${samplesPage.number - 1}}">Previous</a>
-                </li>
-                <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, samplesPage.totalPages - 1)}" th:classappend="${pageNum == samplesPage.number} ? 'active'">
-                    <a class="page-link" th:href="@{'/?jobPage=' + ${jobsPage.number} + '&samplePage=' + ${pageNum}}" th:text="${pageNum + 1}"></a>
-                </li>
-                <li class="page-item" th:classappend="${samplesPage.last} ? 'disabled'">
-                    <a class="page-link" th:href="@{'/?jobPage=' + ${jobsPage.number} + '&samplePage=' + ${samplesPage.number + 1}}">Next</a>
-                </li>
-            </ul>
-        </nav>
     </div>
 
+    <!-- Users Table -->
+    <div class="mb-5" th:if="${showUsers}">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">Users</h2>
+                <div class="mb-3">
+                    <form method="get" th:action="@{/}">
+                        <input type="hidden" name="sort" value="position" />
+                        <button type="submit" class="btn btn-outline-primary">Sort by Position</button>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Position</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.id}"></td>
+                            <td th:text="${user.firstName}"></td>
+                            <td th:text="${user.lastName}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td th:text="${user.userType}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container mt-5">
+    <div class="d-flex justify-content-center gap-2">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-outline-danger">Log Out</button>
+        </form>
+        <a th:href="@{/register}" class="btn btn-outline-primary">Register</a>
+        <a th:href="@{/login}" class="btn btn-outline-secondary">Login</a>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

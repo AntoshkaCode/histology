@@ -7,6 +7,16 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
+                <!-- User Position Display -->
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item" th:if="${position != null}">
+                    <span class="navbar-text text-light">
+                        <i class="bi bi-person-badge"></i>
+                        <span th:text="${position}"></span>
+                    </span>
+                </li>
+            </ul>
                 <li class="nav-item">
                     <a class="nav-link" href="/admin">Admin Dashboard</a>
                 </li>
@@ -51,14 +61,9 @@
                     </ul>
                 </li>
             </ul>
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/register">Register</a>
-                </li>
+            <ul class="navbar-nav ms-auto" style="align-items: center;">
             </ul>
+            <div id="navbar-auth" class="d-flex align-items-center ms-auto"></div>
         </div>
     </div>
 </nav>
