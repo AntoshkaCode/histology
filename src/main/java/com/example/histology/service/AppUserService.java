@@ -37,4 +37,8 @@ public class AppUserService {
     public java.util.List<AppUser> findAll() {
         return appUserRepository.findAll();
     }
+
+    public java.util.List<AppUser> searchAppUsers(String search) {
+        return appUserRepository.searchAppUsers(search);
+    }
 }

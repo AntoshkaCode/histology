@@ -48,8 +48,7 @@ public class AdminController {
         List<AppUser> users;
         try {
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-                // TODO: Implement search for AppUser if needed
-                users = java.util.Collections.emptyList();
+                users = appUserService.searchAppUsers(searchTerm.trim());
                 model.addAttribute("searchTerm", searchTerm);
             } else {
                 users = appUserService.findAll();
