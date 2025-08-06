@@ -33,4 +33,8 @@ public class AppUserService {
         user.setUserType(registrationDto.getUserType() != null ? registrationDto.getUserType() : UserType.USER);
         return appUserRepository.save(user);
     }
+
+    public java.util.List<AppUser> findAll() {
+        return appUserRepository.findAll();
+    }
 }

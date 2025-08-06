@@ -18,6 +18,10 @@ public class SampleService {
         return sampleRepository.findAll();
     }
 
+    public List<Sample> searchSamplesByName(String name) {
+        return sampleRepository.findByNameContainingIgnoreCase(name);
+    }
+
     public org.springframework.data.domain.Page<Sample> findAllSamples(org.springframework.data.domain.Pageable pageable) {
         return sampleRepository.findAll(pageable);
     }

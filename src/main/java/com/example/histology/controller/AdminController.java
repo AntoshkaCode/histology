@@ -4,8 +4,10 @@ import com.example.histology.dto.UserRegistrationDto;
 import com.example.histology.model.PI;
 import com.example.histology.model.User;
 import com.example.histology.model.UserType;
+import com.example.histology.model.AppUser;
 import com.example.histology.repository.PIRepository;
 import com.example.histology.service.UserService;
+import com.example.histology.service.AppUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,26 +31,28 @@ public class AdminController {
 
 
     private final UserService userService;
+    private final AppUserService appUserService;
     private final PasswordEncoder passwordEncoder;
     private final PIRepository piRepository;
 
     @Autowired
-    public AdminController(UserService userService, PasswordEncoder passwordEncoder, PIRepository piRepository) {
+    public AdminController(UserService userService, AppUserService appUserService, PasswordEncoder passwordEncoder, PIRepository piRepository) {
         this.userService = userService;
+        this.appUserService = appUserService;
         this.passwordEncoder = passwordEncoder;
         this.piRepository = piRepository;
     }
 
     @GetMapping("/users")
-    public String listUsers(Model model, 
-                          @RequestParam(value = "search", required = false) String searchTerm) {
-        List<User> users = java.util.Collections.emptyList();
+    public String listUsers(Model model, @RequestParam(value = "search", required = false) String searchTerm) {
+        List<AppUser> users;
         try {
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-                users = userService.searchUsers(searchTerm);
+                // TODO: Implement search for AppUser if needed
+                users = java.util.Collections.emptyList();
                 model.addAttribute("searchTerm", searchTerm);
             } else {
-                users = userService.findAllUsers();
+                users = appUserService.findAll();
             }
             if (users == null) users = java.util.Collections.emptyList();
         } catch (Exception e) {
